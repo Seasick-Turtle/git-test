@@ -10,13 +10,14 @@ const createAndWrite = async () => {
   debug.enable('simple-git,git:*');
 
   // TARGET_REPO example: https://github.com/{user}/{repository}.git, in this example I'm using my upload-repo repository
-  // The -n argument is required for noCheckout, so no files/folders will be written to the current directory
-  // this prevents the entire target repo (upload-repo) from moving in with its garbage.
+  // The -n argument is required for noCheckout; this prevents the entire target repo from moving in with its garbage*.
+  // *no files/folders will be written when cloning.
 
-  // However, you will see a folder be created during the process, if everything goes well
-  // the folder will be removed at the end. If not, then you have a new roommate until I get around to fixing that.
+  // The folder that does get created from cloning will be incinerated at the end assuming you didn't break everything.
 
-  // As a side note, you can clone the same repo in here to the same effect.
+  // As a side note, you can clone the same repo in here.
+  // TODO: add authentication
+
   await git.clone(process.env.TARGET_REPO, ['-n']);
 
   const newPath = path.join(__dirname, 'git-test');
@@ -64,6 +65,9 @@ const createAndWrite = async () => {
     .add('./test.json')
     .commit('Testing env')
     .push('origin', 'master', ['--force']);
+
+  // If cloning the same repo, do be sure to do a pull afterwards. Otherwise, you're gonna have a bad time again.
+  // TODO: add check to see if repo is outdated if self cloning/updating
 };
 
 const removeRepo = () => {
