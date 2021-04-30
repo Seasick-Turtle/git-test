@@ -89,8 +89,5 @@ const removeRepo = () => {
   git = simpleGit(__dirname);
   await git
     .stash()
-    // .add('./*')
-    // .commit('Updating self')
-    // .push('origin', 'master', ['--force'])
     .pull();
 })();
