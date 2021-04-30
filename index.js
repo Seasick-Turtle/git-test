@@ -12,11 +12,14 @@ const createAndWrite = async () => {
   // TARGET_REPO example: https://github.com/{user}/{repository}.git, in this example I'm using my upload-repo repository
   // The -n argument is required for noCheckout, so no files/folders will be written to the current directory
   // this prevents the entire target repo (upload-repo) from moving in with its garbage.
+
   // However, you will see a folder be created during the process, if everything goes well
   // the folder will be removed at the end. If not, then you have a new roommate until I get around to fixing that.
+
+  // As a side note, you can clone the same repo in here to the same effect.
   await git.clone(process.env.TARGET_REPO, ['-n']);
 
-  const newPath = path.join(__dirname, 'upload-repo');
+  const newPath = path.join(__dirname, 'git-test');
   const newRepoPath = path.join(newPath, 'test.json');
 
   git = simpleGit(newPath);
@@ -64,7 +67,7 @@ const createAndWrite = async () => {
 };
 
 const removeRepo = () => {
-  fs.rmdirSync('upload-repo', { recursive: true }, (err) => {
+  fs.rmdirSync('git-test', { recursive: true }, (err) => {
     if (err) {
       console.log(err);
     }

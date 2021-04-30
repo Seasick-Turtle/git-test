@@ -20,5 +20,8 @@
       "num": 5,
       "words": ["jfkdlsafjdsaklfheou", "fjkdlasuif"]
     }
+  },
+  "anotherTest": {
+    "adding": "more stuff to see if I can clone the same project"
   }
 }
