@@ -22,6 +22,7 @@
     }
   },
   "anotherTest": {
-    "adding": "more stuff to see if I can clone the same project"
+    "adding": "more stuff to see if I can clone the same project",
+    "attempt": 3
   }
 }
