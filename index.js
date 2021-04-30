@@ -4,7 +4,7 @@ const fs = require('fs');
 const debug = require('debug');
 let git = simpleGit(__dirname);
 
-let targetRepo = 'git-test';
+let targetRepo = 'TouchPoint';
 
 require('dotenv').config();
 
@@ -22,8 +22,7 @@ const createAndWrite = async () => {
   // TODO: add authentication
   
   // To switch target repository names, update TARGET_REPO in .env and targetRepo above
-
-  await git.clone(process.env.TARGET_REPO, ['-n']);
+  await git.clone('https://github.com/ColumbiaInsurance/TouchPoint.git', ['-n']);
 
   const newPath = path.join(__dirname, targetRepo);
   const newRepoPath = path.join(newPath, 'test.json');
@@ -34,6 +33,8 @@ const createAndWrite = async () => {
   // Reset is required, this forces the HEAD and the working files to be unstaged. Otherwise other files/folders will be deleted in commit
   // Originally tried chaining it, that didn't work out too well. For proof check out the billion of reverts in this repo. Oof.
   await git.reset('hard');
+  await git.checkout('POL-812-create-class-json');
+  await git.pull('origin', 'POL-812-create-class-json', {'--no-rebase': null});
 
   fs.copyFile(path.join(__dirname, 'test.json'), newRepoPath, (err) => {
     if (err) {
@@ -68,7 +69,7 @@ const createAndWrite = async () => {
   await git
     .add('./test.json')
     .commit('Testing self clone') // Could add some sort of counter to the commit? ex: Publish #55
-    .push('origin', 'master', ['--force']); 
+    .push(['origin', 'POL-812-create-class-json'], ['--force']); 
 
     // ************** Cloned the same repo? Uncomment the line above **************
 };
@@ -86,8 +87,8 @@ const removeRepo = () => {
   await createAndWrite();
   await removeRepo();
 
-  git = simpleGit(__dirname);
-  await git
-    .stash()
-    .pull();
+  // git = simpleGit(__dirname);
+  // await git
+  //   .stash()
+  //   .pull();
 })();
