@@ -24,6 +24,7 @@ const createAndWrite = async () => {
   // To switch target repository names, update TARGET_REPO in .env and targetRepo above
 
   await git.clone(process.env.TARGET_REPO, ['-n']);
+  await git.stash()
 
   const newPath = path.join(__dirname, targetRepo);
   const newRepoPath = path.join(newPath, 'test.json');
