@@ -4,7 +4,7 @@ const fs = require('fs');
 const debug = require('debug');
 let git = simpleGit(__dirname);
 
-let targetRepo = 'upload-repo';
+let targetRepo = 'git-test';
 
 require('dotenv').config();
 
@@ -67,9 +67,15 @@ const createAndWrite = async () => {
 
   await git
     .add('./test.json')
-    .commit('Your commit message goes here') // Could add some sort of counter to the commit? ex: Publish #55
+    .commit('Testing self clone') // Could add some sort of counter to the commit? ex: Publish #55
     .push('origin', 'master', ['--force']); 
-    // .pull();
+
+    git = simpleGit(__dirname);
+    await git
+      .add('./*')
+      .commit('Updating self')
+      .push('origin', 'master', ['--force'])
+      .pull();
     // ************** Cloned the same repo? Uncomment the line above **************
 };
 
