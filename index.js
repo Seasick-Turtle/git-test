@@ -1,62 +1,78 @@
 const simpleGit = require('simple-git');
 const path = require('path');
-let git = simpleGit(path.resolve(__dirname));
 const fs = require('fs');
 const debug = require('debug');
+let git = simpleGit(__dirname);
+
 require('dotenv').config();
 
-const testObj = {
-  obj: {
-    sampleObj: { 
-      moreStuff: 'Stringg',
-      num2: 4782378,
-      num: 412, 
-      words: 'ofhdjsklfd jfkl dsajfklds',
-      address: '378 bleh',
-      didItWork: 'Maybe'
-    }
-  }
-};
-
-const createRepo = async () => {
+const createAndWrite = async () => {
   debug.enable('simple-git,git:*');
-  await git.clone(process.env.TARGET_REPO, ['-n'])
 
-  git = simpleGit(path.resolve(__dirname, './upload-repo'));
+  // TARGET_REPO example: https://github.com/{user}/{repository}.git, in this example I'm using my upload-repo repository
+  // The -n argument is required for noCheckout, so no files/folders will be written to the current directory
+  // this prevents the entire target repo (upload-repo) from moving in with its garbage.
+  // However, you will see a folder be created during the process, if everything goes well
+  // the folder will be removed at the end. If not, then you have a new roommate until I get around to fixing that.
+  await git.clone(process.env.TARGET_REPO, ['-n']);
 
+  const newPath = path.join(__dirname, 'upload-repo');
+  const newRepoPath = path.join(newPath, 'test.json');
+
+  git = simpleGit(newPath);
+
+  // Reset is required, otherwise other files/folders will be deleted in commit
+  // Originally tried chaining it, that didn't work out too well. For proof check out the billion of reverts in this repo. Oof.
   await git.reset('hard');
 
-  await writeToRepo();
-  await addAndCommit(git);
+  fs.copyFile(path.join(__dirname, 'test.json'), newRepoPath, (err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('Successfully copied and moved the file');
+    }
+  });
 
-}
+  // Write option
+  // const testObj = {
+  //   obj: {
+  //     sampleObj: {
+  //       moreStuff: 'Stringg',
+  //       num2: 4782378,
+  //       num: 412,
+  //       words: 'ofhdjsklfd jfkl dsajfklds',
+  //       address: '378 bleh',
+  //       didItWork: 'Yuus',
+  //     },
+  //   },
+  // };
+
+  // fs.writeFileSync(
+  //   path.join(newPath, '/test.json'),
+  //   JSON.stringify(testObj),
+  //   (err) => {
+  //     if (err) console.log('Failed**********', err);
+  //   },
+  // );
+
+  // Could add some sort of counter to the commit?
+  // ex: Publish #55
+  await git
+    .add('./test.json')
+    .commit('Testing env')
+    .push('origin', 'master', ['--force']);
+};
 
 const removeRepo = () => {
-  fs.rmdirSync('upload-repo', {recursive: true}, (err) => {
+  fs.rmdirSync('upload-repo', { recursive: true }, (err) => {
     if (err) {
       console.log(err);
     }
-  })
-}
+  });
+};
 
-const writeToRepo = async () => {
-  console.log('write')
-  fs.writeFileSync(path.resolve(__dirname, './upload-repo/test.json'), JSON.stringify(testObj), (err) => {
-    if (err) console.log('Failed**********', err);
-  })
-}
-
-const addAndCommit = async (newGit) => {
-  await newGit
-    .add('./test.json')
-    .commit('Testing env')
-    .push('origin', 'master', ['--force'])
-}
-
-const createAndRemove = async () => {
-  await createRepo();
+// Feel free to kill the IIFE
+(async () => {
+  await createAndWrite();
   await removeRepo();
-
-}
-
-createAndRemove();
+})();
