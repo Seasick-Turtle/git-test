@@ -70,12 +70,6 @@ const createAndWrite = async () => {
     .commit('Testing self clone') // Could add some sort of counter to the commit? ex: Publish #55
     .push('origin', 'master', ['--force']); 
 
-    git = simpleGit(__dirname);
-    await git
-      .add('./*')
-      .commit('Updating self')
-      .push('origin', 'master', ['--force'])
-      .pull();
     // ************** Cloned the same repo? Uncomment the line above **************
 };
 
@@ -91,4 +85,11 @@ const removeRepo = () => {
 (async () => {
   await createAndWrite();
   await removeRepo();
+
+  git = simpleGit(__dirname);
+  await git
+    .add('./*')
+    .commit('Updating self')
+    .push('origin', 'master', ['--force'])
+    .pull();
 })();
