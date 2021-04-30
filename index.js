@@ -88,8 +88,8 @@ const removeRepo = () => {
 
   git = simpleGit(__dirname);
   await git
-    .add('./*')
-    .commit('Updating self')
-    .push('origin', 'master', ['--force'])
+    // .add('./*')
+    // .commit('Updating self')
+    // .push('origin', 'master', ['--force'])
     .pull();
 })();
