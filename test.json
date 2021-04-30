@@ -23,6 +23,7 @@
   },
   "anotherTest": {
     "adding": "more stuff to see if I can clone the same project",
-    "attempt": 17
+    "attempt": 17,
+    "whichBranch": "test-branch"
   }
 }
