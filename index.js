@@ -16,6 +16,7 @@ const createAndWrite = async () => {
   // The folder that does get created from cloning will be incinerated at the end assuming you didn't break everything.
 
   // As a side note, you can clone the same repo in here.
+  // If cloning the same repo, do be sure to do a pull afterwards. Otherwise, you're gonna have a bad time... again.
   // TODO: add authentication
 
   await git.clone(process.env.TARGET_REPO, ['-n']);
@@ -59,15 +60,13 @@ const createAndWrite = async () => {
   //   },
   // );
 
-  // Could add some sort of counter to the commit?
-  // ex: Publish #55
+  // ************** Cloned the same repo? Do a git pull after **************
+  // TODO: add check to see if repo is outdated if self cloning/updating
+
   await git
     .add('./test.json')
-    .commit('Testing env')
+    .commit('Testing env') // Could add some sort of counter to the commit? ex: Publish #55
     .push('origin', 'master', ['--force']);
-
-  // If cloning the same repo, do be sure to do a pull afterwards. Otherwise, you're gonna have a bad time again.
-  // TODO: add check to see if repo is outdated if self cloning/updating
 };
 
 const removeRepo = () => {
