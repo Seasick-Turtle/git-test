@@ -1,6 +1,8 @@
 const simpleGit = require('simple-git');
 const path = require('path');
 const fs = require('fs');
+const { fs: memfs } = require('memfs');
+const { ufs } = require('unionfs');
 const debug = require('debug');
 let git = simpleGit(__dirname);
 
@@ -60,13 +62,14 @@ const createAndWrite = async () => {
     },
   };
 
-  fs.writeFileSync(
-    testFilePath,
-    JSON.stringify(testObj),
-    (err) => {
-      err ? console.log('Failed**********', err) : console.log('Successfully created file');
-    },
-  );
+  ufs
+    .use(memfs)
+    .use(fs);
+
+  memfs.writeFileSync('/test.json', JSON.stringify(testObj));
+  ufs.writeFileSync(testFilePath, memfs.readFileSync('/test.json'))  
+ 
+  // console.log(memfs.readFileSync('/test.json', 'utf8'));
 
   await git
     .add('./test.json')
@@ -89,8 +92,8 @@ const removeRepo = () => {
   await createAndWrite();
   await removeRepo();
 
-  // git = simpleGit(__dirname);
-  // await git
-  //   .stash()
-  //   .pull();
+  git = simpleGit(__dirname);
+  await git
+    .stash()
+    .pull();
 })();
