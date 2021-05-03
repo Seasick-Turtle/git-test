@@ -25,7 +25,6 @@ const createAndWrite = async () => {
 	// TODO: add authentication
 
 	// To switch target repository names, update TARGET_REPO in .env and targetRepo above
-	await git.addRemote('test-branch', process.env.TARGET_REPO);
 	await git.clone(process.env.TARGET_REPO, ['-n']);
 
 	const newPath = path.join(__dirname, targetRepo);
