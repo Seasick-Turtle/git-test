@@ -25,7 +25,9 @@ const createAndWrite = async () => {
 	// TODO: add authentication
 
 	// To switch target repository names, update TARGET_REPO in .env and targetRepo above
-	await git.clone(process.env.TARGET_REPO, ['-n']);
+	await git.raw(
+		`git clone ${process.env.TARGET_REPO} --single-branch -b test-branch -n`,
+	);
 
 	const newPath = path.join(__dirname, targetRepo);
 	const testFilePath = path.join(newPath, 'test.json');
@@ -35,9 +37,9 @@ const createAndWrite = async () => {
 
 	// Reset is required, this forces the HEAD and the working files to be unstaged. Otherwise other files/folders will be deleted in commit
 	// Originally tried chaining it, that didn't work out too well. For proof check out the billion of reverts in this repo. Oof.
-	await git.checkout(targetBranch);
+	// await git.checkout(targetBranch);
 	await git.reset('hard');
-	// await git.pull('origin', targetBranch, {'--no-rebase': null});
+	await git.pull('origin', targetBranch, { '--no-rebase': null });
 
 	// fs.copyFile(path.join(__dirname, 'test.json'), newRepoPath, (err) => {
 	//   if (err) {
