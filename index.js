@@ -25,6 +25,7 @@ const createAndWrite = async () => {
   // TODO: add authentication
   
   // To switch target repository names, update TARGET_REPO in .env and targetRepo above
+  await git.addRemote('test-branch', process.env.TARGET_REPO);
   await git.clone(process.env.TARGET_REPO, ['-n']);
 
   const newPath = path.join(__dirname, targetRepo);
@@ -35,8 +36,8 @@ const createAndWrite = async () => {
 
   // Reset is required, this forces the HEAD and the working files to be unstaged. Otherwise other files/folders will be deleted in commit
   // Originally tried chaining it, that didn't work out too well. For proof check out the billion of reverts in this repo. Oof.
-  await git.reset('hard');
   await git.checkout(targetBranch);
+  await git.reset('hard');
   await git.pull('origin', targetBranch, {'--no-rebase': null});
 
   // fs.copyFile(path.join(__dirname, 'test.json'), newRepoPath, (err) => {
@@ -51,6 +52,7 @@ const createAndWrite = async () => {
   const testObj = {
     obj: {
       sampleObj: {
+        attempt: 4,
         moreStuff: 'Stringg',
         num2: 4782378,
         num: 412,
@@ -93,7 +95,7 @@ const removeRepo = () => {
   await removeRepo();
 
   git = simpleGit(__dirname);
-  await git
-    .stash()
-    .pull();
+  // await git
+  //   .stash()
+  //   .pull();
 })();
