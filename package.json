@@ -5,7 +5,9 @@
   "main": "index.js",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "simple-git": "^2.38.0"
+    "memfs": "^3.2.2",
+    "simple-git": "^2.38.0",
+    "unionfs": "^4.4.0"
   },
   "devDependencies": {},
   "scripts": {
