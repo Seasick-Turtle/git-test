@@ -25,7 +25,7 @@ const createAndWrite = async () => {
   // TODO: add authentication
   
   // To switch target repository names, update TARGET_REPO in .env and targetRepo above
-.  await git.raw('git clone', [process.env.TARGET_REPO, '--single-branch', '-b test-branch', '-n'])
+  await git.raw('git clone', [process.env.TARGET_REPO, '--single-branch', '-b test-branch', '-n'])
 
   const newPath = path.join(__dirname, targetRepo);
   const testFilePath = path.join(newPath, 'test.json');
