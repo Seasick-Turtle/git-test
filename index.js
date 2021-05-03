@@ -37,7 +37,7 @@ const createAndWrite = async () => {
 	// Originally tried chaining it, that didn't work out too well. For proof check out the billion of reverts in this repo. Oof.
 	await git.checkout(targetBranch);
 	await git.reset('hard');
-	await git.pull('origin', targetBranch, { '--no-rebase': null });
+	// await git.pull('origin', targetBranch, {'--no-rebase': null});
 
 	// fs.copyFile(path.join(__dirname, 'test.json'), newRepoPath, (err) => {
 	//   if (err) {
@@ -90,7 +90,5 @@ const removeRepo = () => {
 	await removeRepo();
 
 	git = simpleGit(__dirname);
-	// await git
-	//   .stash()
-	//   .pull();
+	await git.stash().pull();
 })();
