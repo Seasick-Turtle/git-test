@@ -5,6 +5,7 @@ const debug = require('debug');
 let git = simpleGit(__dirname);
 
 let targetRepo = 'TouchPoint';
+const targetBranch = 'test-branch';
 
 require('dotenv').config();
 
@@ -22,7 +23,7 @@ const createAndWrite = async () => {
   // TODO: add authentication
   
   // To switch target repository names, update TARGET_REPO in .env and targetRepo above
-  await git.clone('https://github.com/ColumbiaInsurance/TouchPoint.git', ['-n']);
+  await git.clone(process.env.TARGET_REPO, ['-n']);
 
   const newPath = path.join(__dirname, targetRepo);
   const newRepoPath = path.join(newPath, 'test.json');
@@ -33,45 +34,46 @@ const createAndWrite = async () => {
   // Reset is required, this forces the HEAD and the working files to be unstaged. Otherwise other files/folders will be deleted in commit
   // Originally tried chaining it, that didn't work out too well. For proof check out the billion of reverts in this repo. Oof.
   await git.reset('hard');
-  await git.checkout('POL-812-create-class-json');
-  await git.pull('origin', 'POL-812-create-class-json', {'--no-rebase': null});
+  await git.checkout(targetBranch);
+  await git.pull('origin', targetBranch, {'--no-rebase': null});
 
-  fs.copyFile(path.join(__dirname, 'test.json'), newRepoPath, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Successfully copied and moved the file');
-    }
-  });
+  // fs.copyFile(path.join(__dirname, 'test.json'), newRepoPath, (err) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log('Successfully copied and moved the file');
+  //   }
+  // });
 
   // Write option
-  // const testObj = {
-  //   obj: {
-  //     sampleObj: {
-  //       moreStuff: 'Stringg',
-  //       num2: 4782378,
-  //       num: 412,
-  //       words: 'ofhdjsklfd jfkl dsajfklds',
-  //       address: '378 bleh',
-  //       didItWork: 'Yuus',
-  //     },
-  //   },
-  // };
+  const testObj = {
+    obj: {
+      sampleObj: {
+        moreStuff: 'Stringg',
+        num2: 4782378,
+        num: 412,
+        words: 'ofhdjsklfd jfkl dsajfklds',
+        address: '378 bleh',
+        didItWork: 'Yuus',
+        notWritingFromFile: true
+      },
+    },
+  };
 
-  // fs.writeFileSync(
-  //   path.join(newPath, '/test.json'),
-  //   JSON.stringify(testObj),
-  //   (err) => {
-  //     if (err) console.log('Failed**********', err);
-  //   },
-  // );
+  fs.writeFileSync(
+    path.join(newPath, '/test.json'),
+    JSON.stringify(testObj),
+    (err) => {
+      err ? console.log('Failed**********', err) : console.log('Successfully created file');
+    },
+  );
 
   await git
     .add('./test.json')
-    .commit('Testing self clone') // Could add some sort of counter to the commit? ex: Publish #55
-    .push(['origin', 'POL-812-create-class-json'], ['--force']); 
+    .commit('Testing writing from memory')
+    .push(['origin', targetBranch], ['--force']); 
 
-    // ************** Cloned the same repo? Uncomment the line above **************
+    
 };
 
 const removeRepo = () => {
