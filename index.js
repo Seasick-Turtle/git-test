@@ -4,7 +4,7 @@ const fs = require('fs');
 const debug = require('debug');
 let git = simpleGit(__dirname);
 
-let targetRepo = 'TouchPoint';
+let targetRepo = 'git-test';
 const targetBranch = 'test-branch';
 
 require('dotenv').config();
