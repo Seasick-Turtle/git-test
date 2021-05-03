@@ -2,7 +2,6 @@ const simpleGit = require('simple-git');
 const path = require('path');
 const fs = require('fs');
 const { fs: memfs } = require('memfs');
-const { ufs } = require('unionfs');
 const debug = require('debug');
 let git = simpleGit(__dirname);
 
@@ -25,9 +24,7 @@ const createAndWrite = async () => {
   // TODO: add authentication
   
   // To switch target repository names, update TARGET_REPO in .env and targetRepo above
-  // await git.init().addRemote('origin', process.env.TARGET_REPO);
   await git.clone(process.env.TARGET_REPO, ['--single-branch','-btest-branch', '-n']);
-  console.log(await git.branch())
 
   const newPath = path.join(__dirname, targetRepo);
   const testFilePath = path.join(newPath, 'test.json');
@@ -37,9 +34,8 @@ const createAndWrite = async () => {
 
   // Reset is required, this forces the HEAD and the working files to be unstaged. Otherwise other files/folders will be deleted in commit
   // Originally tried chaining it, that didn't work out too well. For proof check out the billion of reverts in this repo. Oof.
-  // await git.checkout(targetBranch);
   await git.reset('hard');
-  // await git.pull('origin', targetBranch, {'--no-rebase': null});
+  await git.pull('origin', targetBranch, {'--no-rebase': null});
 
   // fs.copyFile(path.join(__dirname, 'test.json'), newRepoPath, (err) => {
   //   if (err) {
@@ -53,7 +49,7 @@ const createAndWrite = async () => {
   const testObj = {
     obj: {
       sampleObj: {
-        attempt: 4,
+        attempt: 5,
         moreStuff: 'Stringg',
         num2: 4782378,
         num: 412,
@@ -65,21 +61,17 @@ const createAndWrite = async () => {
     },
   };
 
-  ufs
-    .use(memfs)
-    .use(fs);
-
   memfs.writeFileSync('/test.json', JSON.stringify(testObj));
-  ufs.writeFileSync(testFilePath, memfs.readFileSync('/test.json'))  
- 
-  // console.log(memfs.readFileSync('/test.json', 'utf8'));
+
+  const jsonFile = await Buffer.from(memfs.readFileSync('/test.json'));
+
+  console.log(jsonFile.toString());
+  fs.writeFileSync(testFilePath, jsonFile.toString());
 
   await git
     .add('./test.json')
     .commit('Testing writing from memory')
-    .push(['origin', targetBranch], ['--force']); 
-
-    
+    .push(['origin', targetBranch], ['--force']);     
 };
 
 const removeRepo = () => {
@@ -96,7 +88,7 @@ const removeRepo = () => {
   await removeRepo();
 
   git = simpleGit(__dirname);
-  await git
-    .stash()
-    .pull();
+  // await git
+  //   .stash()
+  //   .pull();
 })();
