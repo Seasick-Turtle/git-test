@@ -26,7 +26,7 @@ const createAndWrite = async () => {
 	await git.clone(process.env.TARGET_REPO, ['-n']);
 
 	const newPath = path.join(__dirname, targetRepo);
-	const newRepoPath = path.join(newPath, 'test.json');
+	const testFilePath = path.join(newPath, 'test.json');
 
 	// Switch over to the target repo, if you don't then commits will be done under git-test
 	git = simpleGit(newPath);
@@ -60,15 +60,11 @@ const createAndWrite = async () => {
 		},
 	};
 
-	fs.writeFileSync(
-		path.join(newPath, '/test.json'),
-		JSON.stringify(testObj),
-		(err) => {
-			err
-				? console.log('Failed**********', err)
-				: console.log('Successfully created file');
-		},
-	);
+	fs.writeFileSync(testFilePath, JSON.stringify(testObj), (err) => {
+		err
+			? console.log('Failed**********', err)
+			: console.log('Successfully created file');
+	});
 
 	await git
 		.add('./test.json')
