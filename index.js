@@ -27,13 +27,13 @@ const createAndWrite = async () => {
   // To switch target repository names, update TARGET_REPO in .env and targetRepo above
   // await git.init().addRemote('origin', process.env.TARGET_REPO);
   await git.clone(process.env.TARGET_REPO, ['--single-branch','-btest-branch', '-n']);
-  console.log(await git.branch())
-
+  
   const newPath = path.join(__dirname, targetRepo);
   const testFilePath = path.join(newPath, 'test.json');
   
   // Switch over to the target repo, if you don't then commits will be done under git-test
   git = simpleGit(newPath);
+  console.log(await git.branch())
 
   // Reset is required, this forces the HEAD and the working files to be unstaged. Otherwise other files/folders will be deleted in commit
   // Originally tried chaining it, that didn't work out too well. For proof check out the billion of reverts in this repo. Oof.
