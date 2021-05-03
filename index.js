@@ -26,7 +26,8 @@ const createAndWrite = async () => {
   
   // To switch target repository names, update TARGET_REPO in .env and targetRepo above
   // await git.init().addRemote('origin', process.env.TARGET_REPO);
-  await git.clone(process.env.TARGET_REPO, ['--single-branch','-btest-branch', '-n']);
+  await git.clone(process.env.TARGET_REPO, ['--single-branch','-btest-branch', '--noCheckout']);
+  console.log(await git.branch())
 
   const newPath = path.join(__dirname, targetRepo);
   const testFilePath = path.join(newPath, 'test.json');
