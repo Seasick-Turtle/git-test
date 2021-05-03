@@ -12,70 +12,72 @@ const targetBranch = 'test-branch';
 require('dotenv').config();
 
 const createAndWrite = async () => {
-	debug.enable('simple-git,git:*');
+  debug.enable('simple-git,git:*');
 
-	// TARGET_REPO example: https://github.com/{user}/{repository}.git, in this example I'm using my upload-repo repository
-	// The -n argument is required for noCheckout; *this prevents the entire target repo from moving in with its garbage.
-	// *no files/folders will be written to the disk when cloning.
+  // TARGET_REPO example: https://github.com/{user}/{repository}.git, in this example I'm using my upload-repo repository
+  // The -n argument is required for noCheckout; *this prevents the entire target repo from moving in with its garbage.
+  // *no files/folders will be written to the disk when cloning.
 
-	// The folder that does get created from cloning will be incinerated at the end assuming you didn't break everything.
+  // The folder that does get created from cloning will be incinerated at the end assuming you didn't break everything.
 
-	// As a side note, you can clone the same repo in here.
-	// If cloning the same repo, do be sure to do a pull afterwards. Otherwise, you're gonna have a bad time when running this again.
-	// TODO: add authentication
+  // As a side note, you can clone the same repo in here.
+  // If cloning the same repo, do be sure to do a pull afterwards. Otherwise, you're gonna have a bad time when running this again.
+  // TODO: add authentication
+  
+  // To switch target repository names, update TARGET_REPO in .env and targetRepo above
+.  await git.raw('git clone', [process.env.TARGET_REPO, '--single-branch', '-b test-branch', '-n'])
 
-	// To switch target repository names, update TARGET_REPO in .env and targetRepo above
-	await git.raw(
-		`git clone ${process.env.TARGET_REPO} --single-branch -b test-branch -n`,
-	);
+  const newPath = path.join(__dirname, targetRepo);
+  const testFilePath = path.join(newPath, 'test.json');
+  
+  // Switch over to the target repo, if you don't then commits will be done under git-test
+  git = simpleGit(newPath);
 
-	const newPath = path.join(__dirname, targetRepo);
-	const testFilePath = path.join(newPath, 'test.json');
+  // Reset is required, this forces the HEAD and the working files to be unstaged. Otherwise other files/folders will be deleted in commit
+  // Originally tried chaining it, that didn't work out too well. For proof check out the billion of reverts in this repo. Oof.
+  // await git.checkout(targetBranch);
+  await git.reset('hard');
+  await git.pull('origin', targetBranch, {'--no-rebase': null});
 
-	// Switch over to the target repo, if you don't then commits will be done under git-test
-	git = simpleGit(newPath);
+  // fs.copyFile(path.join(__dirname, 'test.json'), newRepoPath, (err) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log('Successfully copied and moved the file');
+  //   }
+  // });
 
-	// Reset is required, this forces the HEAD and the working files to be unstaged. Otherwise other files/folders will be deleted in commit
-	// Originally tried chaining it, that didn't work out too well. For proof check out the billion of reverts in this repo. Oof.
-	// await git.checkout(targetBranch);
-	await git.reset('hard');
-	await git.pull('origin', targetBranch, { '--no-rebase': null });
+  // Write option
+  const testObj = {
+    obj: {
+      sampleObj: {
+        attempt: 4,
+        moreStuff: 'Stringg',
+        num2: 4782378,
+        num: 412,
+        words: 'ofhdjsklfd jfkl dsajfklds',
+        address: '378 bleh',
+        didItWork: 'Yuus',
+        notWritingFromFile: true
+      },
+    },
+  };
 
-	// fs.copyFile(path.join(__dirname, 'test.json'), newRepoPath, (err) => {
-	//   if (err) {
-	//     console.log(err);
-	//   } else {
-	//     console.log('Successfully copied and moved the file');
-	//   }
-	// });
+  ufs
+    .use(memfs)
+    .use(fs);
 
-	// Write option
-	const testObj = {
-		obj: {
-			sampleObj: {
-				attempt: 4,
-				moreStuff: 'Stringg',
-				num2: 4782378,
-				num: 412,
-				words: 'ofhdjsklfd jfkl dsajfklds',
-				address: '378 bleh',
-				didItWork: 'Yuus',
-				notWritingFromFile: true,
-			},
-		},
-	};
+  memfs.writeFileSync('/test.json', JSON.stringify(testObj));
+  ufs.writeFileSync(testFilePath, memfs.readFileSync('/test.json'))  
+ 
+  // console.log(memfs.readFileSync('/test.json', 'utf8'));
 
-	ufs.use(memfs).use(fs);
+  await git
+    .add('./test.json')
+    .commit('Testing writing from memory')
+    .push(['origin', targetBranch], ['--force']); 
 
-	memfs.writeFileSync('/test.json', JSON.stringify(testObj));
-	ufs.writeFileSync(testFilePath, memfs.readFileSync('/test.json'));
-
-	// console.log(memfs.readFileSync('/test.json', 'utf8'));
-
-	await git
-		.add('./test.json')
-		.commit('Testing writing from memory')
-		.push(['origin', targetBranch], ['--force']);
+    
 };
 
 const removeRepo = () => {
