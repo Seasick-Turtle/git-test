@@ -5,6 +5,7 @@ const { fs: memfs } = require('memfs');
 const debug = require('debug');
 let git = simpleGit(__dirname);
 
+
 let targetRepo = 'git-test';
 const targetBranch = 'test-branch';
 
@@ -24,6 +25,7 @@ const createAndWrite = async () => {
   // TODO: add authentication
   
   // To switch target repository names, update TARGET_REPO in .env and targetRepo above
+
   await git.clone(process.env.TARGET_REPO, ['--single-branch','-btest-branch', '-n']);
 
   const newPath = path.join(__dirname, targetRepo);
@@ -70,8 +72,8 @@ const createAndWrite = async () => {
 
   await git
     .add('./test.json')
-    .commit('Testing writing from memory')
-    .push(['origin', targetBranch], ['--force']);     
+    .commit('Testing writing from memory')   
+    .push(['origin', targetBranch], ['--force']); 
 };
 
 const removeRepo = () => {
