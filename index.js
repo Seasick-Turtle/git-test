@@ -91,7 +91,7 @@ const removeRepo = () => {
 	await createAndWrite();
 	await removeRepo();
 
-	git = simpleGit(__dirname);
+	// git = simpleGit(__dirname);
 	// await git
 	//   .stash()
 	//   .pull();
