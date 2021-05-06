@@ -21,7 +21,6 @@ const createAndWrite = async () => {
 
 	// As a side note, you can clone the same repo in here.
 	// If cloning the same repo, do be sure to do a pull afterwards. Otherwise, you're gonna have a bad time when running this again.
-	// TODO: add authentication
 
 	// To switch target repository names, update TARGET_REPO in .env and targetRepo above
 	await git.clone(process.env.TARGET_REPO, [
